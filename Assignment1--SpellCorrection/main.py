@@ -98,7 +98,7 @@ def evaluation(top_list, ms, gt, metrics_set, output, k):
     return df_mean
 
 
-def get_topk(gt, ms, dic, k):
+def get_topk(ms, dic, k, output):
     top_list = []
     for ms_word in tqdm(ms):
         distances = []
@@ -107,6 +107,8 @@ def get_topk(gt, ms, dic, k):
         distances = np.asarray(distances)
         top_k = dic[np.asarray(distances.argpartition(range(k))[:k])]
         top_list.append(top_k)
+    with open(f'{output}/toplist.pkl', 'wb') as file:
+        pickle.dump(top_list, file)
     return top_list
 
 
@@ -116,8 +118,8 @@ def main(args):
     gt, ms, dic = preprocess(dataset)
     k = 10
     chunks = np.array_split(ms, len(ms) / 100)
-    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(gt, i, dic, k) for i in chunks)
-    # top_list = get_topk(gt, ms, dic, k)
+    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, dic, k, args.output) for i in chunks)
+    # top_list = get_topk(ms, dic, k)
     metrics_set = {'success_1,5,10'}
     df_mean = evaluation(top_list, ms, gt, metrics_set, args.output, k)
     df_mean.to_csv(f'{args.output}/pred.eval.mean.csv')
