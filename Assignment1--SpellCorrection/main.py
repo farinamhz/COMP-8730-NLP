@@ -10,8 +10,6 @@ from nltk.corpus import wordnet
 
 def load(input, output):
     print('\nLoading and preprocessing ...')
-    print('#' * 50)
-    t_s = time()
     corpus = []
     try:
         print('\nLoading file ...')
@@ -26,7 +24,6 @@ def load(input, output):
         with open(f'{output}/corpus.pkl', 'wb') as f:
             pickle.dump(corpus, f, protocol=pickle.HIGHEST_PROTOCOL)
     print(f'Dataset: {len(corpus)} entries')
-    print(f'Time elapsed: {(time() - t_s)}')
     return corpus
 
 
@@ -65,7 +62,7 @@ def med_algorithm(str1, str2, m, n):
     return dp[m][n]
 
 
-def evaluation(top_list, ms, gt, metrics_set, output, k):
+def evaluation(top_list, metrics_set, output, k):
     try:
         print('\nLoading qrel and run ...')
         with open(f'{output}/qrel_with_k{k}.pkl', 'rb') as f:
@@ -76,16 +73,13 @@ def evaluation(top_list, ms, gt, metrics_set, output, k):
         print('\nLoading qrel and run files failed! ...')
         qrel = {}
         run = {}
-        for i in range(len(gt)):
-            misspelled = ms[i]
-            qrel[misspelled] = {}
-            qrel[misspelled][gt[i]] = 1
-        for i in range(len(ms)):
-            misspelled = ms[i]
-            run[misspelled] = {}
-            words = top_list[i]
-            for j in range(len(words)):
-                run[misspelled][words[j]] = 1
+        for i, ms_word in enumerate(top_list):
+            run[f'q{i}'] = {}
+            qrel[f'q{i}'] = {}
+            corr_word, mswords_list = top_list[ms_word]
+            qrel[f'q{i}'][corr_word] = 1
+            for w in mswords_list:
+                run[f'q{i}'][w[0]] = 1
         with open(f'{output}/qrel_with_k10.pkl', 'wb') as f:
             pickle.dump(qrel, f)
         with open(f'{output}/run_with_k10.pkl', 'wb') as f:
@@ -98,17 +92,24 @@ def evaluation(top_list, ms, gt, metrics_set, output, k):
     return df_mean
 
 
-def get_topk(ms, dic, k, output):
-    top_list = []
-    for ms_word in tqdm(ms):
-        distances = []
-        for d_idx, d in enumerate(dic):
-            distances.append(med_algorithm(ms_word, d, len(ms_word), len(d)))
-        distances = np.asarray(distances)
-        top_k = dic[np.asarray(distances.argpartition(range(k))[:k])]
-        top_list.append(top_k)
-    with open(f'{output}/toplist.pkl', 'ab') as file:
-        pickle.dump(top_list, file)
+def get_topk(ms, gt, dic, k, output):
+    try:
+        print('\nLoading top list file ...')
+        top_list = dict()
+        with open(f'{output}/toplist.pkl', 'rb') as f:
+            while True:
+                top_list.update(pickle.load(f))
+    except (FileNotFoundError, EOFError) as e:
+        print('\nLoading top list file failed! ...')
+        top_list = dict()
+        for i in tqdm(range(len(ms))):
+            distances = []
+            for d_idx, d in enumerate(dic):
+                distances.append((d, med_algorithm(ms[i], d, len(ms[i]), len(d))))
+            distances.sort(key=lambda x: x[1])
+            top_list[ms[i]] = (gt[i], distances[:k])
+        with open(f'{output}/toplist.pkl', 'ab') as file:
+            pickle.dump(top_list, file)
     return top_list
 
 
@@ -117,11 +118,11 @@ def main(args):
     dataset = load(args.data, args.output)
     gt, ms, dic = preprocess(dataset)
     k = 10
-    chunks = np.array_split(ms, len(ms) / 100)
-    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, dic, k, args.output) for i in chunks)
-    # top_list = get_topk(ms, dic, k)
+    chunks = np.array_split(ms, len(ms) / 50)
+    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(ms, gt, dic, k, args.output) for i in chunks)
+    # top_list = get_topk(ms, gt, dic, k, args.output)
     metrics_set = {'success_1,5,10'}
-    df_mean = evaluation(top_list, ms, gt, metrics_set, args.output, k)
+    df_mean = evaluation(top_list, metrics_set, args.output, k)
     df_mean.to_csv(f'{args.output}/pred.eval.mean.csv')
 
 
