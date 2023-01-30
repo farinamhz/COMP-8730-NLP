@@ -107,7 +107,7 @@ def get_topk(ms, dic, k, output):
         distances = np.asarray(distances)
         top_k = dic[np.asarray(distances.argpartition(range(k))[:k])]
         top_list.append(top_k)
-    with open(f'{output}/toplist.pkl', 'wb') as file:
+    with open(f'{output}/toplist.pkl', 'ab') as file:
         pickle.dump(top_list, file)
     return top_list
 
