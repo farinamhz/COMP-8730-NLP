@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 import pytrec_eval
 from nltk.corpus import wordnet
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def load(input, output):
     print('\nLoading and preprocessing ...')
@@ -74,12 +75,12 @@ def evaluation(top_list, metrics_set, output, k):
         qrel = {}
         run = {}
         for i, ms_word in enumerate(top_list):
-            qrel[f'q{i}'] = {}
             run[f'q{i}'] = {}
+            qrel[f'q{i}'] = {}
             corr_word, mswords_list = top_list[ms_word]
-            run[f'q{i}'][corr_word] = 1
-            for w in mswords_list:
-                qrel[f'q{i}'][w[0]] = 1
+            qrel[f'q{i}'][corr_word] = 1
+            for j in range(len(mswords_list)):
+                run[f'q{i}'][mswords_list[i][0]] = len(mswords_list) - j
         with open(f'{output}/qrel_with_k10.pkl', 'wb') as f:
             pickle.dump(qrel, f)
         with open(f'{output}/run_with_k10.pkl', 'wb') as f:
@@ -106,33 +107,49 @@ def get_topk(ms, gt, dic, k, output):
     return top_list
 
 
+def visualization(result_path, output):
+    r = pd.read_csv(result_path)
+    r.columns = ['k', 'mean']
+    r = r.replace('_', ' @', regex=True)
+    ax = sns.barplot(y="mean", x="k", data=r, estimator=sum)
+    for i in ax.containers:
+        ax.bar_label(i, )
+    ax.set(ylim=(0.0, 1.0))
+    plt.title("Success @K", fontsize=20, pad=15)
+    plt.xlabel('Metric', fontsize=15, labelpad=5)
+    plt.ylabel('Value', fontsize=15, labelpad=5)
+    plt.savefig(f'{output}result.png')
+
+
 def main(args):
     if not os.path.isdir(f'{args.output}'): os.makedirs(f'{args.output}')
 
-    # print('\nLoading top list file ...')
-    # top_list_list = list()
-    # with open(f'{args.output}/toplist.pkl', 'rb') as f:
-    #     while True:
-    #         try:
-    #             top_list.append(pickle.load(f))
-    #         except EOFError:
-    #             break
-    # top_list = dict()
-    # for t in top_list_list:
-    #     top_list.update(t)
+    print('\nLoading top list file ...')
+    top_list_list = list()
+    with open(f'{args.output}/toplist.pkl', 'rb') as f:
+        while True:
+            try:
+                top_list_list.append(pickle.load(f))
+            except EOFError:
+                break
+    top_list = dict()
+    for t in top_list_list:
+        top_list.update(t)
 
     dataset = load(args.data, args.output)
     gt, ms, dic = preprocess(dataset)
     k = 10
-    chunks = np.array_split(ms, len(ms) / 50)
-    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
+    # chunks = np.array_split(ms, len(ms) / 50)
+    # top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
     # top_list = get_topk(ms, gt, dic, k, args.output)
     print(f'Dataset have {len(dataset)} entries and {len(gt)} unique correct words and unique {len(ms)} misspelled words')
     print(f"Wordnet dictionary has {len(dic)} unique words")
     # print(f'Most similar words to {ms[0]}: {top_list[ms[0]]}')
     metrics_set = {'success_1,5,10'}
     df_mean = evaluation(top_list, metrics_set, args.output, k)
-    df_mean.to_csv(f'{args.output}/pred.eval.mean.csv')
+    result_path = f'{args.output}/pred.eval.mean.csv'
+    df_mean.to_csv(result_path)
+    visualization(result_path, args.output)
 
 
 if __name__ == '__main__':
