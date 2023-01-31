@@ -80,7 +80,7 @@ def evaluation(top_list, metrics_set, output, k):
             corr_word, mswords_list = top_list[ms_word]
             qrel[f'q{i}'][corr_word] = 1
             for j in range(len(mswords_list)):
-                run[f'q{i}'][mswords_list[i][0]] = len(mswords_list) - j
+                run[f'q{i}'][mswords_list[j][0]] = len(mswords_list) - j
         with open(f'{output}/qrel_with_k10.pkl', 'wb') as f:
             pickle.dump(qrel, f)
         with open(f'{output}/run_with_k10.pkl', 'wb') as f:
@@ -125,8 +125,14 @@ def main(args):
     if not os.path.isdir(f'{args.output}'): os.makedirs(f'{args.output}')
 
     print('\nLoading top list file ...')
+    dataset = load(args.data, args.output)
+    gt, ms, dic = preprocess(dataset)
+    k = 10
+    # chunks = np.array_split(ms, len(ms) / 50)
+    # top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
+
     top_list_list = list()
-    with open(f'{args.output}/toplist.pkl', 'rb') as f:
+    with open(f'{args.output}/similarity_dict.pkl', 'rb') as f:
         while True:
             try:
                 top_list_list.append(pickle.load(f))
@@ -136,11 +142,6 @@ def main(args):
     for t in top_list_list:
         top_list.update(t)
 
-    dataset = load(args.data, args.output)
-    gt, ms, dic = preprocess(dataset)
-    k = 10
-    # chunks = np.array_split(ms, len(ms) / 50)
-    # top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
     # top_list = get_topk(ms, gt, dic, k, args.output)
     print(f'Dataset have {len(dataset)} entries and {len(gt)} unique correct words and unique {len(ms)} misspelled words')
     print(f"Wordnet dictionary has {len(dic)} unique words")
