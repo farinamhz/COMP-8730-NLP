@@ -114,7 +114,7 @@ def visualization(result_path, output):
     ax = sns.barplot(y="mean", x="k", data=r, estimator=sum)
     for i in ax.containers:
         ax.bar_label(i, )
-    ax.set(ylim=(0.0, 1.0))
+    # ax.set(ylim=(0.0, 1.0))
     plt.title("Success @K", fontsize=20, pad=15)
     plt.xlabel('Metric', fontsize=15, labelpad=5)
     plt.ylabel('Value', fontsize=15, labelpad=5)
