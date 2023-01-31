@@ -132,7 +132,7 @@ def main(args):
     # top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
 
     top_list_list = list()
-    with open(f'{args.output}/similarity_dict.pkl', 'rb') as f:
+    with open(f'{args.output}/toplist.pkl', 'rb') as f:
         while True:
             try:
                 top_list_list.append(pickle.load(f))
