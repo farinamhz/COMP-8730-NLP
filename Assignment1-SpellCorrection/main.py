@@ -128,8 +128,8 @@ def main(args):
     dataset = load(args.data, args.output)
     gt, ms, dic = preprocess(dataset)
     k = 10
-    chunks = np.array_split(ms, len(ms) / 50)
-    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
+    # chunks = np.array_split(ms, len(ms) / 50)
+    # top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
 
     top_list_list = list()
     with open(f'{args.output}/toplist.pkl', 'rb') as f:
@@ -143,7 +143,7 @@ def main(args):
         top_list.update(t)
 
     # top_list = get_topk(ms, gt, dic, k, args.output)
-    print(f'Dataset have {len(dataset)} entries and {len(gt)} unique correct words and unique {len(ms)} misspelled words')
+    print(f'Dataset have {len(dataset)} entries and {len(set(gt))} unique correct words and unique {len(ms)} misspelled words')
     print(f"Wordnet dictionary has {len(dic)} unique words")
     # print(f'Most similar words to {ms[0]}: {top_list[ms[0]]}')
     metrics_set = {'success_1,5,10'}
@@ -154,7 +154,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Latent Aspect Detection')
+    parser = argparse.ArgumentParser(description='Auto Spell Correction')
     parser.add_argument('--data', dest='data', type=str, default='birkbeck-corpus/ms.dat',
                         help='Dataset file path, e.g., birkbeck-corpus/ms.dat')
     parser.add_argument('--output', dest='output', type=str, default='output', help='output path, e.g., ../output/')
