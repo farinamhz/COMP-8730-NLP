@@ -20,10 +20,10 @@ Additionally, you need to install the following library from its source:
 We have a misspelled datasets at [`./birckbeck/ms.dat`](./birckbeck/ms.dat).
 
 ### Run
-You can run the code via [`./Assignment1--SpellCorrection/main.py`](./src/Assignment1--SpellCorrection/main.py) with following command:
+You can run the code via [`./Assignment1-SpellCorrection/main.py`](./src/Assignment1-SpellCorrection/main.py) with following command:
 
 ```bash
-cd Assignment1--SpellCorrection
+cd Assignment1-SpellCorrection
 python main.py
 ```
 where the input arguements are:
