@@ -93,26 +93,16 @@ def evaluation(top_list, metrics_set, output, k):
 
 
 def get_topk(ms, gt, dic, k, output):
-    try:
-        print('\nLoading top list file ...')
-        top_list = dict()
-        with open(f'{output}/toplist.pkl', 'rb') as f:
-            while True:
-                try:
-                    top_list.update(pickle.load(f))
-                except EOFError:
-                    break
-    except (FileNotFoundError, EOFError) as e:
-        print('\nLoading top list file failed! ...')
-        top_list = dict()
-        for i in tqdm(range(len(ms))):
-            distances = []
-            for d_idx, d in enumerate(dic):
-                distances.append((d, med_algorithm(ms[i], d, len(ms[i]), len(d))))
-            distances.sort(key=lambda x: x[1])
-            top_list[ms[i]] = (gt[i], distances[:k])
-        with open(f'{output}/toplist.pkl', 'ab') as file:
-            pickle.dump(top_list, file)
+    print('\nLoading top list file failed! ...')
+    top_list = dict()
+    for i in tqdm(range(len(ms))):
+        distances = []
+        for d_idx, d in enumerate(dic):
+            distances.append((d, med_algorithm(ms[i], d, len(ms[i]), len(d))))
+        distances.sort(key=lambda x: x[1])
+        top_list[ms[i]] = (gt[i], distances[:k])
+    with open(f'{output}/toplist.pkl', 'ab') as file:
+        pickle.dump(top_list, file)
     return top_list
 
 
