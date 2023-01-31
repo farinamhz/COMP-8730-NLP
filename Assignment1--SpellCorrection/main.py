@@ -74,12 +74,12 @@ def evaluation(top_list, metrics_set, output, k):
         qrel = {}
         run = {}
         for i, ms_word in enumerate(top_list):
-            run[f'q{i}'] = {}
             qrel[f'q{i}'] = {}
+            run[f'q{i}'] = {}
             corr_word, mswords_list = top_list[ms_word]
-            qrel[f'q{i}'][corr_word] = 1
+            run[f'q{i}'][corr_word] = 1
             for w in mswords_list:
-                run[f'q{i}'][w[0]] = 1
+                qrel[f'q{i}'][w[0]] = 1
         with open(f'{output}/qrel_with_k10.pkl', 'wb') as f:
             pickle.dump(qrel, f)
         with open(f'{output}/run_with_k10.pkl', 'wb') as f:
@@ -98,7 +98,10 @@ def get_topk(ms, gt, dic, k, output):
         top_list = dict()
         with open(f'{output}/toplist.pkl', 'rb') as f:
             while True:
-                top_list.update(pickle.load(f))
+                try:
+                    top_list.update(pickle.load(f))
+                except EOFError:
+                    break
     except (FileNotFoundError, EOFError) as e:
         print('\nLoading top list file failed! ...')
         top_list = dict()
@@ -121,6 +124,9 @@ def main(args):
     chunks = np.array_split(ms, len(ms) / 50)
     top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(ms, gt, dic, k, args.output) for i in chunks)
     # top_list = get_topk(ms, gt, dic, k, args.output)
+    print(f'Dataset have {len(dataset)} entries and {len(gt)} unique correct words and unique {len(ms)} misspelled words')
+    print(f"Wordnet dictionary has {len(dic)} unique words")
+    # print(f'Most similar words to {ms[0]}: {top_list[ms[0]]}')
     metrics_set = {'success_1,5,10'}
     df_mean = evaluation(top_list, metrics_set, args.output, k)
     df_mean.to_csv(f'{args.output}/pred.eval.mean.csv')
