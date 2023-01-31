@@ -128,8 +128,8 @@ def main(args):
     dataset = load(args.data, args.output)
     gt, ms, dic = preprocess(dataset)
     k = 10
-    # chunks = np.array_split(ms, len(ms) / 50)
-    # top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
+    chunks = np.array_split(ms, len(ms) / 50)
+    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
 
     top_list_list = list()
     with open(f'{args.output}/toplist.pkl', 'rb') as f:
