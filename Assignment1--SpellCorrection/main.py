@@ -93,7 +93,7 @@ def evaluation(top_list, metrics_set, output, k):
 
 
 def get_topk(ms, gt, dic, k, output):
-    print('\nLoading top list file failed! ...')
+    # print('\nLoading top list file failed! ...')
     top_list = dict()
     for i in tqdm(range(len(ms))):
         distances = []
@@ -108,6 +108,19 @@ def get_topk(ms, gt, dic, k, output):
 
 def main(args):
     if not os.path.isdir(f'{args.output}'): os.makedirs(f'{args.output}')
+
+    # print('\nLoading top list file ...')
+    # top_list_list = list()
+    # with open(f'{args.output}/toplist.pkl', 'rb') as f:
+    #     while True:
+    #         try:
+    #             top_list.append(pickle.load(f))
+    #         except EOFError:
+    #             break
+    # top_list = dict()
+    # for t in top_list_list:
+    #     top_list.update(t)
+
     dataset = load(args.data, args.output)
     gt, ms, dic = preprocess(dataset)
     k = 10
