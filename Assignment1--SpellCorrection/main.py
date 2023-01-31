@@ -125,7 +125,7 @@ def main(args):
     gt, ms, dic = preprocess(dataset)
     k = 10
     chunks = np.array_split(ms, len(ms) / 50)
-    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(ms, gt, dic, k, args.output) for i in chunks)
+    top_list = Parallel(n_jobs=-1, prefer="processes")(delayed(get_topk)(i, gt, dic, k, args.output) for i in chunks)
     # top_list = get_topk(ms, gt, dic, k, args.output)
     print(f'Dataset have {len(dataset)} entries and {len(gt)} unique correct words and unique {len(ms)} misspelled words')
     print(f"Wordnet dictionary has {len(dic)} unique words")
