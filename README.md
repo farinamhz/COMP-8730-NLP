@@ -28,5 +28,5 @@ python main.py
 ```
 where the input arguements are:
 
-`data`: dataset file path
-`output`: Output path
+- `data`: dataset file path
+- `output`: Output path
