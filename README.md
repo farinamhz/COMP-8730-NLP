@@ -29,12 +29,13 @@ Additionally, you need to install the following library from its source:
 
 ### Assignment 1
 
-****Run
+**Run**
+
 You can run the code via [`./Assignment1-SpellCorrection/main.py`](./src/Assignment1-SpellCorrection/main.py) with following command:
 
 ```bash
 cd Assignment1-SpellCorrection
-python main.py
+python main.py --data birckbeck/ms.dat --output output
 ```
 where the input arguements are:
 
@@ -43,12 +44,13 @@ where the input arguements are:
 
 ### Assignment 2
 
-****Run
+**Run**
+
 You can run the code via [`./Assignment2-SpellCorrection/main.py`](./src/Assignment2-SpellCorrection/main.py) with following command:
 
 ```bash
 cd Assignment2-SpellCorrection
-python main.py
+python main.py --data x --output output
 ```
 where the input arguements are:
 
