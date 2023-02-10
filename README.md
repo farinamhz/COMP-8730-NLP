@@ -37,7 +37,7 @@ You can run the code via [`./Assignment1-SpellCorrection/main.py`](./Assignment1
 cd Assignment1-SpellCorrection
 python main.py --data birckbeck/ms.dat --output output
 ```
-where the input arguements are:
+where the input arguments are:
 
 - `data`: Dataset file path
 - `output`: Output path
@@ -52,7 +52,7 @@ You can run the code via [`./Assignment2-SpellCorrectionUsingLMn/main.py`](./Ass
 cd Assignment2-SpellCorrection
 python main.py --data birkbeck-corpus/APPLING1DAT.643 --output output
 ```
-where the input arguements are:
+where the input arguments are:
 
 - `data`: Dataset file path
 - `output`: Output path
