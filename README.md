@@ -22,7 +22,7 @@ Additionally, you need to install the following library from its source:
 - ``brown`` corpus as a requirement in ``nltk`` library with the following command:
   
   ```bash
-  python -m 
+  python -m nltk.downloader brown
   ```
 
 ## Quickstart
@@ -50,7 +50,7 @@ You can run the code via [`./Assignment2-SpellCorrection/main.py`](./src/Assignm
 
 ```bash
 cd Assignment2-SpellCorrection
-python main.py --data x --output output
+python main.py --data birkbeck-corpus/APPLING1DAT.643 --output output
 ```
 where the input arguements are:
 
