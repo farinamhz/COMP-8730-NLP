@@ -46,7 +46,7 @@ where the input arguements are:
 
 **Run**
 
-You can run the code via [`./Assignment2-SpellCorrection/main.py`](./src/Assignment2-SpellCorrection/main.py) with following command:
+You can run the code via [`./Assignment2-SpellCorrectionUsingLMn/main.py`](./src/Assignment2-SpellCorrectionUsingLM/main.py) with following command:
 
 ```bash
 cd Assignment2-SpellCorrection
