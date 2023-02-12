@@ -46,10 +46,10 @@ where the input arguments are:
 
 **Run**
 
-You can run the code via [`./Assignment2-SpellCorrectionUsingLMn/main.py`](./Assignment2-SpellCorrectionUsingLM/main.py) with following command:
+You can run the code via [`./Assignment2-SpellCorrectionUsingLM/main.py`](./Assignment2-SpellCorrectionUsingLM/main.py) with following command:
 
 ```bash
-cd Assignment2-SpellCorrection
+cd Assignment2-SpellCorrectionUsingLM
 python main.py --data birkbeck-corpus/APPLING1DAT.643 --output output
 ```
 where the input arguments are:
