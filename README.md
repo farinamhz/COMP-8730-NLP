@@ -1,5 +1,5 @@
 # COMP-8730-NLP
-A repository for the assignments of COMP-8730 course
+This is a repository for the assignments of COMP-8730 course (Natural Language Processiong & Understanding).
 
 ## Setup
 This work has been developed on `Python 3.8` and can be installed by `pip`:
