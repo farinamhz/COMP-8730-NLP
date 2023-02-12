@@ -27,6 +27,8 @@ Additionally, you need to install the following library from its source:
 
 ## Quickstart
 
+You can run the code for all the assignments' codes using this script: [``Colab Notebook``](https://colab.research.google.com/drive/1YWSMIdIpJkouFadmZEKr8K2pYoUDChvg?usp=sharing)
+
 ### Assignment 1
 
 **Run**
