@@ -35,7 +35,7 @@ You can run the code via [`./Assignment1-SpellCorrection/main.py`](./Assignment1
 
 ```bash
 cd Assignment1-SpellCorrection
-python main.py --data birckbeck/ms.dat --output output
+python main.py --data birkbeck-corpus/ms.dat --output output
 ```
 where the input arguments are:
 
