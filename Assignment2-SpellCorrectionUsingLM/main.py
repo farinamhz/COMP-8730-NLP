@@ -1,6 +1,5 @@
 import argparse, os, pickle
 from tqdm import tqdm
-from time import time
 import numpy as np
 import pandas as pd
 import pytrec_eval
@@ -86,18 +85,27 @@ def evaluation(top_list, gt, metrics_set, output, k):
     return df_mean
 
 
-def visualization(result_path, output):
-    r = pd.read_csv(result_path)
-    r.columns = ['k', 'mean']
-    r = r.replace('_', ' @', regex=True)
-    ax = sns.barplot(y="mean", x="k", data=r, estimator=sum)
-    for i in ax.containers:
-        ax.bar_label(i, )
-    # ax.set(ylim=(0.0, 1.0))
-    plt.title("Success @K", fontsize=20, pad=15)
-    plt.xlabel('Metric', fontsize=15, labelpad=5)
-    plt.ylabel('Value', fontsize=15, labelpad=5)
-    plt.savefig(f'{output}result.png')
+def visualization(result_path, metric_list, topk):
+    x = pd.read_csv(f'{result_path}/{metric_list[0]}-gram/pred.eval.mean.csv')
+    x.columns = ['Metric', 'mean']
+    merged = x['Metric']
+    for m in metric_list:
+        lm = pd.read_csv(f'{result_path}/{m}-gram/pred.eval.mean.csv')
+        merged = pd.concat([merged, lm['mean']], axis=1)
+    column_names = ['Metric']
+    for l in [f'{m}-gram' for m in metric_list]:
+        column_names.append(l)
+    merged.columns = column_names
+    print(merged)
+    melted_query = merged.melt('Metric', var_name='language_models', value_name='Values')
+    p = sns.lineplot(x='Metric', y='Values', hue='language_models', palette='Set2', linewidth=5, data=melted_query)
+    p.lines[1].set_linestyle("solid")
+    p.lines[2].set_linestyle("dashed")
+    p.lines[3].set_linestyle("dashdot")
+    p.lines[4].set_linestyle("dotted")
+    plt.legend(loc='upper right')
+    plt.title('Success @k')
+    plt.savefig(f'{result_path}/Success_outputresult.png')
     plt.clf()
 
 
@@ -105,9 +113,14 @@ def main(args):
     if not os.path.isdir(f'{args.output}'): os.makedirs(f'{args.output}')
     ms_dataset = load(args.data, args.output)
     ms, gt, sents, brown_dataset, dic = preprocess(ms_dataset)
+
+    print(f'Dataset: {len(sents)} sentences, {len(set(gt))} unique correct and unique {len(set(ms))} misspelled words')
+    print(f"Brown dictionary has {len(dic)} unique words")
+
     ngram_models = dict()
     k = 10
-    for n in [1, 2, 3, 5, 10]:  # [1, 2, 3, 5, 10]
+    metric_list = [1, 2, 3, 5, 10]
+    for n in metric_list:  # [1, 2, 3, 5, 10]
         ngram_models[n] = train(n, brown_dataset)
     for n in ngram_models:
         top_list = dict()
@@ -125,12 +138,11 @@ def main(args):
         model_path = f'{args.output}/{n}-gram'
         if not os.path.isdir(f'{model_path}'): os.makedirs(f'{model_path}')
         df_mean = evaluation(top_list, gt, metrics_set, model_path, k)
-        # print(f'Dataset: {len(dataset)} Entries, {len(set(gt))} unique correct and unique {len(ms)} misspelled words')
-        # print(f"Brown dictionary has {len(dic)} unique words")
-        # print(f'Most similar words to {ms[0]}: {top_list[ms[0]]}')
         result_path = f'{model_path}/pred.eval.mean.csv'
         df_mean.to_csv(result_path)
-        visualization(result_path, model_path)
+        # print(f'{n}-gram model:')
+        # for i in range(len(ms)):
+        #     print(f'Most similar words to {ms[i]} with correct format {gt[i]}: {top_list[i]}')
 
 
 if __name__ == '__main__':
@@ -141,3 +153,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args)
+
+    metric_list = [1, 2, 3, 5, 10]
+    visualization(args.output, metric_list, [1, 5, 10])
