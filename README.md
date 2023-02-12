@@ -31,7 +31,6 @@ You can run the code for all the assignments using this script: [``Colab Noteboo
 
 ### Assignment 1
 
-**Run**
 
 You can run the code via [`./Assignment1-SpellCorrection/main.py`](./Assignment1-SpellCorrection/main.py) with following command:
 
@@ -46,7 +45,6 @@ where the input arguments are:
 
 ### Assignment 2
 
-**Run**
 
 You can run the code via [`./Assignment2-SpellCorrectionUsingLM/main.py`](./Assignment2-SpellCorrectionUsingLM/main.py) with following command:
 
